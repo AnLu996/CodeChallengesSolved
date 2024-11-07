@@ -1,0 +1,3 @@
+i = i >> 1: En cada iteración, el valor de i se divide entre 2 usando el operador de desplazamiento 
+            de bits a la derecha (>>), lo que es equivalente a hacer i = i / 2 pero más eficiente.
+
