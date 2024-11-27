@@ -1,69 +1,72 @@
 #include <iostream>
-#include <vector>
-#include <set>
-#include <map>
 #include <string>
-#include <cstring>
-#include <algorithm>
+#include <set>
+#include <vector>
+#include <unordered_set>
 
 using namespace std;
 
-// Function to perform DFS and mark connected nodes
-void dfs(char node, map<char, set<char>>& graph, set<char>& visited) {
-    visited.insert(node);
-    for (char neighbor : graph[node]) {
-        if (visited.find(neighbor) == visited.end()) {
-            dfs(neighbor, graph, visited);
-        }
-    }
-}
-
 int main() {
-    int testCases;
-    cin >> testCases;
-    cin.ignore(); // Ignore the newline after the number of test cases
-    
-    bool firstCase = true;
-    
-    while (testCases--) {
-        if (!firstCase) cout << "\n";
-        firstCase = false;
+    int t;
+    cin >> t;
+    cin.ignore();  // Ignorar el salto de línea después del número de casos
+    string str;
+    getline(cin, str);  // Ignorar la línea en blanco inicial
 
-        string line;
-        
-        // Read the largest node, which defines the range of nodes
-        getline(cin, line); // Read empty line between cases
-        getline(cin, line);
-        char largestNode = line[0];
+    while (t--) {
+        vector<set<char>> groups;
+        unordered_set<char> allNodes;  // Conjunto para rastrear todos los nodos
+        char largestNode;
 
-        // Initialize the graph
-        map<char, set<char>> graph;
-        for (char node = 'A'; node <= largestNode; ++node) {
-            graph[node] = set<char>();
+        // Leer el nodo más grande
+        cin >> largestNode;
+        cin.ignore();
+
+        // Agregar todos los nodos al conjunto de nodos totales
+        for (char node = 'A'; node <= largestNode; node++) {
+            allNodes.insert(node);
         }
 
-        // Read the edges
-        while (getline(cin, line) && !line.empty()) {
-            char u = line[0], v = line[1];
-            graph[u].insert(v);
-            graph[v].insert(u);
-        }
+        // Leer todos los pares de caracteres en la entrada hasta el cambio de caso.
+        while (getline(cin, str) && !str.empty()) {
+            char first = str[0];
+            char second = str[1];
+            bool merged = false;
 
-        // Count the number of connected components
-        set<char> visited;
-        int components = 0;
-
-        for (char node = 'A'; node <= largestNode; ++node) {
-            if (visited.find(node) == visited.end()) {
-                // New connected component found
-                dfs(node, graph, visited);
-                components++;
+            // Intentar agregar el par a uno de los grupos existentes.
+            for (auto& group : groups) {
+                if (group.count(first) || group.count(second)) {
+                    group.insert(first);
+                    group.insert(second);
+                    merged = true;
+                    break;
+                }
             }
+
+            // Si no se pudo agregar a ningún grupo, crear uno nuevo.
+            if (!merged) {
+                set<char> newGroup = {first, second};
+                groups.push_back(newGroup);
+            }
+
+            // Remover los nodos conectados del conjunto de nodos individuales
+            allNodes.erase(first);
+            allNodes.erase(second);
         }
 
-        // Output the number of components for this test case
-        cout << components << "\n";
+        // Agregar cada nodo individual como un grupo propio
+        for (char node : allNodes) {
+            groups.push_back({node});
+        }
+
+        // Imprimir el resultado para este caso
+        cout << groups.size() << endl;
+
+        // Imprimir una línea en blanco entre casos, excepto al final
+        if (t > 0) {
+            cout << endl;
+        }
     }
-    
+
     return 0;
 }
